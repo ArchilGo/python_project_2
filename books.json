@@ -1,0 +1,123 @@
+[
+    {
+        "type": "PrintedBook",
+        "title": "1984",
+        "author": "George Orwell",
+        "year": 1949,
+        "genre": "Fiction",
+        "pages": 328,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "year": 1960,
+        "genre": "Fiction",
+        "pages": 281,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "year": 1925,
+        "genre": "Fiction",
+        "pages": 180,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "Pride and Prejudice",
+        "author": "Jane Austen",
+        "year": 1813,
+        "genre": "Romance",
+        "pages": 432,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "The Hobbit",
+        "author": "J.R.R. Tolkien",
+        "year": 1937,
+        "genre": "Fantasy",
+        "pages": 310,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "The Catcher in the Rye",
+        "author": "J.D. Salinger",
+        "year": 1951,
+        "genre": "Fiction",
+        "pages": 277,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "The Alchemist",
+        "author": "Paulo Coelho",
+        "year": 1988,
+        "genre": "Fiction",
+        "pages": 208,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "The Da Vinci Code",
+        "author": "Dan Brown",
+        "year": 2003,
+        "genre": "Mystery & Thriller",
+        "pages": 454,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "Harry Potter and the Philosopher's Stone",
+        "author": "J.K. Rowling",
+        "year": 1997,
+        "genre": "Fantasy",
+        "pages": 223,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "The Little Prince",
+        "author": "Antoine de Saint-Exupéry",
+        "year": 1943,
+        "genre": "Children's",
+        "pages": 96,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "Building a Seond Brain",
+        "author": "Tiago Forte",
+        "year": 2022,
+        "genre": "Self-Help",
+        "pages": 260,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
+    }
+]
