@@ -119,5 +119,16 @@
         "status": "In Library",
         "person": null,
         "borrowed_date": null
+    },
+    {
+        "type": "PrintedBook",
+        "title": "Animal Farm",
+        "author": "George Orwell",
+        "year": 1945,
+        "genre": "Fiction",
+        "pages": 128,
+        "status": "In Library",
+        "person": null,
+        "borrowed_date": null
     }
 ]

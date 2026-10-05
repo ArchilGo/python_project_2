@@ -379,6 +379,21 @@ class BookManager:
 
         return None
 
+    # -----------------------------------------------------
+    # SEARCH BOOKS BY AUTHOR
+    # -----------------------------------------------------
+
+    def search_by_author(self, author):
+
+        found_books = []
+
+        for book in self.books:
+
+            if author.lower() in book.author.lower():
+                found_books.append(book)
+
+        return found_books
+
 
 # =========================================================
 # DECORATORS
@@ -715,6 +730,100 @@ def add_new_book(manager):
 
 
 # =========================================================
+# SEARCH BOOKS
+# =========================================================
+
+
+def search_books(manager):
+
+    print("\n--- SEARCH BOOK ---")
+
+    print("1. Search by Title")
+    print("2. Search by Author")
+    print("0. Back")
+
+    while True:
+
+        search_type = input(
+            "Choose search type: "
+        ).strip()
+
+        if search_type in [
+            "0",
+            "1",
+            "2"
+        ]:
+            break
+
+        print(
+            "Error: Please choose 0, 1, or 2."
+        )
+
+    if search_type == "0":
+        return
+
+    # -----------------------------------------------------
+    # SEARCH BY TITLE
+    # -----------------------------------------------------
+
+    if search_type == "1":
+
+        title = get_valid_text(
+            "Enter book title: "
+        )
+
+        book = manager.search_book(
+            title
+        )
+
+        if book:
+
+            print("\nBook found:")
+            print(book)
+
+        else:
+
+            print(
+                "\nBook not found."
+            )
+
+    # -----------------------------------------------------
+    # SEARCH BY AUTHOR
+    # -----------------------------------------------------
+
+    else:
+
+        author = get_valid_text(
+            "Enter author: "
+        )
+
+        found_books = manager.search_by_author(
+            author
+        )
+
+        if found_books:
+
+            print(
+                f"\nFound {len(found_books)} "
+                f"book(s) by \"{author}\":"
+            )
+
+            for number, book in enumerate(
+                found_books,
+                start=1
+            ):
+
+                print(f"{number}. {book}")
+
+        else:
+
+            print(
+                "\nNo books found by "
+                "that author."
+            )
+
+
+# =========================================================
 # MAIN PROGRAM
 # =========================================================
 
@@ -754,28 +863,7 @@ def main():
 
         elif choice == "3":
 
-            print(
-                "\n--- SEARCH BOOK ---"
-            )
-
-            title = get_valid_text(
-                "Enter book title: "
-            )
-
-            book = manager.search_book(
-                title
-            )
-
-            if book:
-
-                print("\nBook found:")
-                print(book)
-
-            else:
-
-                print(
-                    "\nBook not found."
-                )
+            search_books(manager)
 
         # Exit
 
