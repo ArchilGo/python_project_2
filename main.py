@@ -1,3 +1,4 @@
+import functools
 import json
 
 
@@ -380,6 +381,45 @@ class BookManager:
 
 
 # =========================================================
+# DECORATORS
+# =========================================================
+
+
+def retry_on_invalid(error_message):
+    """
+    Keep calling the decorated input function until it
+    returns a value.
+
+    - If the function raises ValueError (for example,
+      int() on non-numeric input), error_message is shown.
+    - If the function returns None, it already printed its
+      own error, so we simply ask again.
+    """
+
+    def decorator(func):
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+
+            while True:
+
+                try:
+
+                    result = func(*args, **kwargs)
+
+                    if result is not None:
+                        return result
+
+                except ValueError:
+
+                    print(error_message)
+
+        return wrapper
+
+    return decorator
+
+
+# =========================================================
 # INPUT VALIDATION FUNCTIONS
 # =========================================================
 
@@ -398,59 +438,41 @@ def get_valid_text(message):
         )
 
 
+@retry_on_invalid("Error: Please enter a valid year.")
 def get_valid_year():
 
-    while True:
+    year = int(
+        input("Enter publication year: ")
+    )
 
-        try:
+    if year <= 0:
 
-            year = int(
-                input("Enter publication year: ")
-            )
+        print(
+            "Error: Year must be greater than 0."
+        )
 
-            if year <= 0:
+        return None
 
-                print(
-                    "Error: Year must be greater than 0."
-                )
-
-                continue
-
-            return year
-
-        except ValueError:
-
-            print(
-                "Error: Please enter a valid year."
-            )
+    return year
 
 
+@retry_on_invalid("Error: Please enter a valid number.")
 def get_valid_pages():
 
-    while True:
+    pages = int(
+        input("Enter number of pages: ")
+    )
 
-        try:
+    if pages <= 0:
 
-            pages = int(
-                input("Enter number of pages: ")
-            )
+        print(
+            "Error: Number of pages "
+            "must be greater than 0."
+        )
 
-            if pages <= 0:
+        return None
 
-                print(
-                    "Error: Number of pages "
-                    "must be greater than 0."
-                )
-
-                continue
-
-            return pages
-
-        except ValueError:
-
-            print(
-                "Error: Please enter a valid number."
-            )
+    return pages
 
 
 def get_genre():
@@ -464,29 +486,27 @@ def get_genre():
 
         print(f"{number}. {genre}")
 
-    while True:
+    return choose_genre()
 
-        try:
 
-            choice = int(
-                input("Choose genre: ")
-            )
+@retry_on_invalid("Error: Please enter a number.")
+def choose_genre():
 
-            if 1 <= choice <= len(Book.GENRES):
+    choice = int(
+        input("Choose genre: ")
+    )
 
-                return Book.GENRES[
-                    choice - 1
-                ]
+    if 1 <= choice <= len(Book.GENRES):
 
-            print(
-                "Error: Invalid genre."
-            )
+        return Book.GENRES[
+            choice - 1
+        ]
 
-        except ValueError:
+    print(
+        "Error: Invalid genre."
+    )
 
-            print(
-                "Error: Please enter a number."
-            )
+    return None
 
 
 def get_status(printed=False):
@@ -524,53 +544,44 @@ def get_status(printed=False):
             )
 
 
+@retry_on_invalid("Error: Please enter valid numbers.")
 def get_audio_duration():
 
-    while True:
+    hours = int(
+        input("Enter duration hours: ")
+    )
 
-        try:
+    minutes = int(
+        input("Enter duration minutes: ")
+    )
 
-            hours = int(
-                input("Enter duration hours: ")
-            )
+    if hours < 0:
 
-            minutes = int(
-                input("Enter duration minutes: ")
-            )
+        print(
+            "Error: Hours cannot be negative."
+        )
 
-            if hours < 0:
+        return None
 
-                print(
-                    "Error: Hours cannot be negative."
-                )
+    if minutes < 0 or minutes > 59:
 
-                continue
+        print(
+            "Error: Minutes must be "
+            "between 0 and 59."
+        )
 
-            if minutes < 0 or minutes > 59:
+        return None
 
-                print(
-                    "Error: Minutes must be "
-                    "between 0 and 59."
-                )
+    if hours == 0 and minutes == 0:
 
-                continue
+        print(
+            "Error: Duration must be "
+            "greater than 0."
+        )
 
-            if hours == 0 and minutes == 0:
+        return None
 
-                print(
-                    "Error: Duration must be "
-                    "greater than 0."
-                )
-
-                continue
-
-            return hours, minutes
-
-        except ValueError:
-
-            print(
-                "Error: Please enter valid numbers."
-            )
+    return hours, minutes
 
 
 # =========================================================
