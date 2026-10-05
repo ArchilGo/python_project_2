@@ -76,6 +76,11 @@ class PrintedBook(Book):
         self.person = person
         self.borrowed_date = borrowed_date
 
+    def return_book(self, status):
+        self.status = status
+        self.person = None
+        self.borrowed_date = None
+
     def __str__(self):
         result = (
             f"{super().__str__()} | "
@@ -824,6 +829,145 @@ def search_books(manager):
 
 
 # =========================================================
+# EDIT BOOK
+# =========================================================
+
+
+def edit_book(manager):
+
+    print("\n--- EDIT BOOK ---")
+
+    title = get_valid_text(
+        "Enter title of the book to edit: "
+    )
+
+    book = manager.search_book(
+        title
+    )
+
+    if not book:
+
+        print(
+            "\nBook not found."
+        )
+
+        return
+
+    is_audio = isinstance(book, AudioBook)
+
+    while True:
+
+        print("\nCurrent book:")
+        print(book)
+
+        print("\n--- WHAT DO YOU WANT TO EDIT? ---")
+
+        print("1. Title")
+        print("2. Author")
+        print("3. Year")
+        print("4. Genre")
+
+        if is_audio:
+            print("5. Duration")
+        else:
+            print("5. Pages")
+
+        print("6. Status")
+        print("0. Done")
+
+        choice = input(
+            "Choose field: "
+        ).strip()
+
+        if choice == "0":
+            break
+
+        elif choice == "1":
+
+            book.title = get_valid_text(
+                "Enter new title: "
+            )
+
+        elif choice == "2":
+
+            book.author = get_valid_text(
+                "Enter new author: "
+            )
+
+        elif choice == "3":
+
+            book.year = get_valid_year()
+
+        elif choice == "4":
+
+            book.genre = get_genre()
+
+        elif choice == "5" and is_audio:
+
+            book.hours, book.minutes = (
+                get_audio_duration()
+            )
+
+        elif choice == "5":
+
+            book.pages = get_valid_pages()
+
+        elif choice == "6":
+
+            edit_status(book)
+
+        else:
+
+            print(
+                "Error: Please choose "
+                "0, 1, 2, 3, 4, 5, or 6."
+            )
+
+    manager.save_books()
+
+    print(
+        f'\n"{book.title}" was updated successfully.'
+    )
+
+
+def edit_status(book):
+
+    # Only printed books can be borrowed out
+
+    if not isinstance(book, PrintedBook):
+
+        book.status = get_status()
+
+        return
+
+    status = get_status(
+        printed=True
+    )
+
+    if status == "Borrowed Out":
+
+        person = get_valid_text(
+            "Enter person who borrowed "
+            "the book: "
+        )
+
+        borrowed_date = get_valid_text(
+            "Enter borrowed date: "
+        )
+
+        book.borrow_book(
+            person,
+            borrowed_date
+        )
+
+    else:
+
+        book.return_book(
+            status
+        )
+
+
+# =========================================================
 # MAIN PROGRAM
 # =========================================================
 
@@ -841,6 +985,7 @@ def main():
         print("1. Add Book")
         print("2. Show All Books")
         print("3. Search Book")
+        print("4. Edit Book")
         print("0. Exit")
 
         choice = input(
@@ -865,6 +1010,12 @@ def main():
 
             search_books(manager)
 
+        # Edit Book
+
+        elif choice == "4":
+
+            edit_book(manager)
+
         # Exit
 
         elif choice == "0":
@@ -879,7 +1030,7 @@ def main():
 
             print(
                 "Error: Invalid option. "
-                "Please choose 0, 1, 2, or 3."
+                "Please choose 0, 1, 2, 3, or 4."
             )
 
 
