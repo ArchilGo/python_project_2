@@ -83,9 +83,9 @@
         "year": 2003,
         "genre": "Mystery & Thriller",
         "pages": 454,
-        "status": "In Library",
-        "person": null,
-        "borrowed_date": null
+        "status": "Borrowed Out",
+        "person": "George Ninoshvili",
+        "borrowed_date": "2026-05-25"
     },
     {
         "type": "PrintedBook",
@@ -127,8 +127,8 @@
         "year": 1945,
         "genre": "Fiction",
         "pages": 128,
-        "status": "In Library",
-        "person": null,
-        "borrowed_date": null
+        "status": "Borrowed Out",
+        "person": "Beka Bolokadze",
+        "borrowed_date": "2026-01-16"
     }
 ]

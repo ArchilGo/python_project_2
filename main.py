@@ -1,5 +1,6 @@
 import functools
 import json
+from datetime import date, datetime
 
 
 # =========================================================
@@ -176,6 +177,61 @@ class AudioBook(Book):
 
 
 # =========================================================
+# DISPLAY
+# =========================================================
+
+
+def print_book_details(number, book):
+
+    print(f"\n{number}. {book.title}")
+
+    print(f"   Author: {book.author}")
+    print(f"   Year: {book.year}")
+    print(f"   Genre: {book.genre}")
+
+    # Printed Book
+
+    if isinstance(book, PrintedBook):
+
+        print("   Type: Printed Book")
+        print(f"   Pages: {book.pages}")
+        print(f"   Status: {book.status}")
+
+        if book.status == "Borrowed Out":
+
+            print(
+                f"   Borrowed by: {book.person}"
+            )
+
+            print(
+                f"   Borrowed date: "
+                f"{book.borrowed_date}"
+            )
+
+    # eBook
+
+    elif isinstance(book, EBook):
+
+        print("   Type: eBook")
+        print(f"   Pages: {book.pages}")
+        print(f"   Status: {book.status}")
+
+    # AudioBook
+
+    elif isinstance(book, AudioBook):
+
+        print("   Type: AudioBook")
+
+        print(
+            f"   Duration: "
+            f"{book.hours}h "
+            f"{book.minutes}m"
+        )
+
+        print(f"   Status: {book.status}")
+
+
+# =========================================================
 # BOOK MANAGER
 # =========================================================
 
@@ -322,52 +378,7 @@ class BookManager:
             start=1
         ):
 
-            print(f"\n{number}. {book.title}")
-
-            print(f"   Author: {book.author}")
-            print(f"   Year: {book.year}")
-            print(f"   Genre: {book.genre}")
-
-            # Printed Book
-
-            if isinstance(book, PrintedBook):
-
-                print("   Type: Printed Book")
-                print(f"   Pages: {book.pages}")
-                print(f"   Status: {book.status}")
-
-                if book.status == "Borrowed Out":
-
-                    print(
-                        f"   Borrowed by: {book.person}"
-                    )
-
-                    print(
-                        f"   Borrowed date: "
-                        f"{book.borrowed_date}"
-                    )
-
-            # eBook
-
-            elif isinstance(book, EBook):
-
-                print("   Type: eBook")
-                print(f"   Pages: {book.pages}")
-                print(f"   Status: {book.status}")
-
-            # AudioBook
-
-            elif isinstance(book, AudioBook):
-
-                print("   Type: AudioBook")
-
-                print(
-                    f"   Duration: "
-                    f"{book.hours}h "
-                    f"{book.minutes}m"
-                )
-
-                print(f"   Status: {book.status}")
+            print_book_details(number, book)
 
         print("\n==============================")
 
@@ -398,6 +409,51 @@ class BookManager:
                 found_books.append(book)
 
         return found_books
+
+    # -----------------------------------------------------
+    # GET LENT OUT BOOKS
+    # -----------------------------------------------------
+
+    def get_lent_out_books(self):
+
+        lent_out_books = []
+
+        for book in self.books:
+
+            if (
+                isinstance(book, PrintedBook)
+                and book.status == "Borrowed Out"
+            ):
+                lent_out_books.append(book)
+
+        # Oldest loans first
+
+        lent_out_books.sort(
+            key=lambda book: book.borrowed_date or ""
+        )
+
+        return lent_out_books
+
+    # -----------------------------------------------------
+    # LEND / RETURN BOOK
+    # -----------------------------------------------------
+
+    def lend_book(self, book, person, borrowed_date):
+
+        book.borrow_book(
+            person,
+            borrowed_date
+        )
+
+        self.save_books()
+
+    def return_book(self, book):
+
+        book.return_book(
+            "In Library"
+        )
+
+        self.save_books()
 
 
 # =========================================================
@@ -604,6 +660,74 @@ def get_audio_duration():
     return hours, minutes
 
 
+def get_valid_name(message):
+
+    while True:
+
+        value = input(message).strip()
+
+        # Allow names like "Mary-Jane", "O'Brien" or "De Silva"
+
+        letters_only = (
+            value
+            .replace("-", "")
+            .replace("'", "")
+            .replace(" ", "")
+        )
+
+        if letters_only.isalpha():
+            return value
+
+        print(
+            "Error: Please enter a valid name "
+            "(letters only)."
+        )
+
+
+@retry_on_invalid(
+    "Error: Please enter a valid date "
+    "in YYYY-MM-DD format."
+)
+def get_valid_date(message):
+
+    value = input(message).strip()
+
+    borrowed_date = datetime.strptime(
+        value,
+        "%Y-%m-%d"
+    ).date()
+
+    if borrowed_date > date.today():
+
+        print(
+            "Error: Date cannot be in the future."
+        )
+
+        return None
+
+    return borrowed_date.isoformat()
+
+
+def get_borrow_details():
+
+    first_name = get_valid_name(
+        "Enter borrower's first name: "
+    )
+
+    last_name = get_valid_name(
+        "Enter borrower's surname: "
+    )
+
+    borrowed_date = get_valid_date(
+        "Enter date lent out (YYYY-MM-DD): "
+    )
+
+    return (
+        f"{first_name} {last_name}",
+        borrowed_date
+    )
+
+
 # =========================================================
 # ADD NEW BOOK
 # =========================================================
@@ -676,13 +800,8 @@ def add_new_book(manager):
 
         if status == "Borrowed Out":
 
-            person = get_valid_text(
-                "Enter person who borrowed "
-                "the book: "
-            )
-
-            borrowed_date = get_valid_text(
-                "Enter borrowed date: "
+            person, borrowed_date = (
+                get_borrow_details()
             )
 
             book.borrow_book(
@@ -784,7 +903,11 @@ def search_books(manager):
         if book:
 
             print("\nBook found:")
-            print(book)
+            print("==============================")
+
+            print_book_details(1, book)
+
+            print("\n==============================")
 
         else:
 
@@ -813,12 +936,16 @@ def search_books(manager):
                 f"book(s) by \"{author}\":"
             )
 
+            print("==============================")
+
             for number, book in enumerate(
                 found_books,
                 start=1
             ):
 
-                print(f"{number}. {book}")
+                print_book_details(number, book)
+
+            print("\n==============================")
 
         else:
 
@@ -826,6 +953,183 @@ def search_books(manager):
                 "\nNo books found by "
                 "that author."
             )
+
+
+# =========================================================
+# SHOW LENT OUT BOOKS
+# =========================================================
+
+
+def show_lent_out_books(manager):
+
+    lent_out_books = manager.get_lent_out_books()
+
+    if not lent_out_books:
+
+        print(
+            "\nNo books are lent out."
+        )
+
+        return
+
+    print("\n==============================")
+    print("       LENT OUT BOOKS")
+    print("==============================")
+
+    for number, book in enumerate(
+        lent_out_books,
+        start=1
+    ):
+
+        print(f"\n{number}. {book.title}")
+
+        print(f"   Author: {book.author}")
+        print(f"   Lent to: {book.person}")
+        print(f"   Lent on: {book.borrowed_date}")
+
+    print("\n==============================")
+
+    print(
+        f"Total lent out: {len(lent_out_books)}"
+    )
+
+
+# =========================================================
+# LEND BOOK
+# =========================================================
+
+
+def lend_book(manager):
+
+    print("\n--- LEND BOOK ---")
+
+    title = get_valid_text(
+        "Enter title of the book to lend: "
+    )
+
+    book = manager.search_book(
+        title
+    )
+
+    if not book:
+
+        print(
+            "\nBook not found."
+        )
+
+        return
+
+    # Only printed books that I own can be lent out
+
+    if not isinstance(book, PrintedBook):
+
+        print(
+            "\nOnly printed books can be lent out."
+        )
+
+        return
+
+    if book.status == "Wish List":
+
+        print(
+            f'\n"{book.title}" is on your wish list, '
+            f"so it is not in your library yet."
+        )
+
+        return
+
+    if book.status == "Borrowed Out":
+
+        print(
+            f'\n"{book.title}" is already lent to '
+            f"{book.person} since {book.borrowed_date}."
+        )
+
+        return
+
+    person, borrowed_date = (
+        get_borrow_details()
+    )
+
+    manager.lend_book(
+        book,
+        person,
+        borrowed_date
+    )
+
+    print(
+        f'\n"{book.title}" was lent to {person} '
+        f"on {borrowed_date}."
+    )
+
+
+# =========================================================
+# RETURN BOOK
+# =========================================================
+
+
+def return_book(manager):
+
+    print("\n--- RETURN BOOK ---")
+
+    lent_out_books = manager.get_lent_out_books()
+
+    if not lent_out_books:
+
+        print(
+            "\nNo books are lent out."
+        )
+
+        return
+
+    for number, book in enumerate(
+        lent_out_books,
+        start=1
+    ):
+
+        print(
+            f"{number}. {book.title} - "
+            f"lent to {book.person} "
+            f"on {book.borrowed_date}"
+        )
+
+    print("0. Back")
+
+    choice = choose_book_number(
+        len(lent_out_books)
+    )
+
+    if choice == 0:
+        return
+
+    book = lent_out_books[choice - 1]
+
+    person = book.person
+
+    manager.return_book(book)
+
+    print(
+        f'\n"{book.title}" was returned by '
+        f"{person} and is back in your library."
+    )
+
+
+@retry_on_invalid("Error: Please enter a number.")
+def choose_book_number(count):
+
+    choice = int(
+        input("Choose book: ")
+    )
+
+    if 0 <= choice <= count:
+        return choice
+
+    print(
+        f"Error: Please choose a number "
+        f"from 0 to {count}."
+    )
+
+    return None
 
 
 # =========================================================
@@ -946,13 +1250,8 @@ def edit_status(book):
 
     if status == "Borrowed Out":
 
-        person = get_valid_text(
-            "Enter person who borrowed "
-            "the book: "
-        )
-
-        borrowed_date = get_valid_text(
-            "Enter borrowed date: "
+        person, borrowed_date = (
+            get_borrow_details()
         )
 
         book.borrow_book(
@@ -982,21 +1281,24 @@ def main():
         print("       PERSONAL LIBRARY")
         print("==============================")
 
-        print("1. Add Book")
+        print("1. Search Book")
         print("2. Show All Books")
-        print("3. Search Book")
+        print("3. Add Book")
         print("4. Edit Book")
+        print("5. Show Lent Out Books")
+        print("6. Lend Book")
+        print("7. Return Book")
         print("0. Exit")
 
         choice = input(
             "Choose an option: "
         ).strip()
 
-        # Add Book
+        # Search Book
 
         if choice == "1":
 
-            add_new_book(manager)
+            search_books(manager)
 
         # Show All Books
 
@@ -1004,17 +1306,35 @@ def main():
 
             manager.show_books()
 
-        # Search Book
+        # Add Book
 
         elif choice == "3":
 
-            search_books(manager)
+            add_new_book(manager)
 
         # Edit Book
 
         elif choice == "4":
 
             edit_book(manager)
+
+        # Show Lent Out Books
+
+        elif choice == "5":
+
+            show_lent_out_books(manager)
+
+        # Lend Book
+
+        elif choice == "6":
+
+            lend_book(manager)
+
+        # Return Book
+
+        elif choice == "7":
+
+            return_book(manager)
 
         # Exit
 
@@ -1030,7 +1350,7 @@ def main():
 
             print(
                 "Error: Invalid option. "
-                "Please choose 0, 1, 2, 3, or 4."
+                "Please choose a number from 0 to 7."
             )
 
 

@@ -6,15 +6,19 @@ A console-based Personal Library Management System built with Python.
 
 - Add books to a personal library
 - Support for Printed Books, eBooks, and AudioBooks
-- Search books by title
+- Search books by title or by author (shows all books by that author)
 - Display all books
+- Edit existing books
 - Store books permanently in a JSON file
 - Automatically load books from JSON when the program starts
 - Track book status:
   - Wish List
   - In Library
   - Borrowed Out
-- Track borrower and borrowed date for printed books
+- Lend and return printed books
+- Track borrower (first name and surname) and lending date (YYYY-MM-DD)
+- Show all lent out books with borrower and date, oldest loans first
+- Input validation for all fields (using a retry decorator)
 
 ## Book Types
 
